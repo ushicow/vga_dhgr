@@ -73,6 +73,7 @@ set_output_delay -clock "clock_vout" -min 1ns [get_ports {pB}]
 set_output_delay -clock "clock_vout" -max 1ns [get_ports {pI}] 
 set_output_delay -clock "clock_vout" -min 1ns [get_ports {pI}] 
 
+
 # tpd constraints
 
 set_max_delay 20.000ns -from [get_ports {pAaddr[*]}] -to [get_ports {pVaddr[*]}]
