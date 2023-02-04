@@ -45,7 +45,6 @@ architecture RTL of vga_dhgr is
     signal page : std_logic;
     signal aux : std_logic;
     signal hires : std_logic;
-    signal page2 : std_logic;
     signal double : std_logic;
     signal hc : std_logic;
     signal code : std_logic_vector(3 downto 0);
@@ -84,15 +83,14 @@ begin
     if (reset = '0') then
         page <= '0';
         aux <= '0';
-        page2 <= '0';
         double <= '0';
         store <= '0';
         hires <= '0';
     elsif (pAq3'event and pAq3 = '0' and pAphi0 = '1') then
         if (pArw = '1') then -- read
             case pAaddr is
-                when X"C054" => page2 <= '0'; -- Page2 off
-                when X"C055" => page2 <= '1'; -- Page2 on
+                when X"C054" => page <= '0'; -- Page2 off
+                when X"C055" => page <= '1'; -- Page2 on
                 when X"C056" => hires <= '0'; -- HIRES off
                 when X"C057" => hires <= '1'; -- HIRES on
                 when X"C05E" => double <= '1'; -- AN3 off / DHR on
@@ -152,7 +150,9 @@ begin
         pVdata <= (others => 'Z');
     elsif (clk'event and clk = '0') then
         if (pcount = "000") then
-            pVaddr <= (((not vram_col(0)) and double) & page2 & vram_row & "000") + 
+            pVaddr(14) <= (not vram_col(0)) and double;
+            pVaddr(13) <= not (double and store) and page;
+            pVaddr(12 downto 0)	<= (vram_row & "000") + 
                 vram_col(6 downto 1);
         end if;
         if (pcount = "001" and vram_col < 80) then
